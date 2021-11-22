@@ -1,0 +1,50 @@
+version: '2'
+
+services:
+  mysql:
+    image: mysql/mysql-server:latest
+    container_name: mysql-ecommerce
+    environment:
+      MYSQL_DATABASE: db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+  vault:
+    image: vault:1.6.0
+    container_name: vault-ecommerce
+    ports:
+      - "8200:8200"
+    environment:
+      - VAULT_ADDR=http://localhost:8200
+      - VAULT_DEV_ROOT_TOKEN_ID=op4BumHD66eeu
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault-init.sh:/vault-init.sh
+    command:
+        sh -c "/vault-init.sh"
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq-ecommerce
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+        - rabbitmq_go_net
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin-ecommerce
+    environment:
+      - STORAGE_TYPE=mem
+    ports:
+      - 9411:9411
+networks:
+  rabbitmq_go_net:
+    driver: bridge

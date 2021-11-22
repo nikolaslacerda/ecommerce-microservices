@@ -26,7 +26,7 @@ public class Item {
 
     private Integer quantity;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_number")
     private Order order;
 }

@@ -20,6 +20,7 @@ public class OrderController {
 
     @PostMapping
     public String createOrder(@RequestBody OrderRequest order) {
+        log.info("Creating order");
         return orderService.createOrder(OrderMapper.mapToDto(order));
     }
 }

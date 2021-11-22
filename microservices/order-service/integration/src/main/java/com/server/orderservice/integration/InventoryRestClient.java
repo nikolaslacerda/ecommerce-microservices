@@ -7,6 +7,7 @@ import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuit
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 
 @Component
@@ -14,9 +15,11 @@ import java.util.function.Supplier;
 public class InventoryRestClient {
 
     private final InventoryClient inventoryClient;
+    private final ExecutorService traceableExecutorService;
     private final Resilience4JCircuitBreakerFactory circuitBreakerFactory;
 
     public boolean isAllItemsInStock(OrderRestRequest order) {
+        circuitBreakerFactory.configureExecutorService(traceableExecutorService);
         Supplier<Boolean> isAllItemsInStock = () ->
                 order.getItems().stream().allMatch(item -> inventoryClient.checkStock(item.getSku()));
         Resilience4JCircuitBreaker circuitBreaker = circuitBreakerFactory.create("inventory");

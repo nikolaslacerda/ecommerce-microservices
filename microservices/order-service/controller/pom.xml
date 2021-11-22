@@ -10,8 +10,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>controller</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>com.server.orderservice</groupId>
+            <artifactId>implementation</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
     <properties>
+        <java.version>15</java.version>
         <maven.compiler.source>15</maven.compiler.source>
         <maven.compiler.target>15</maven.compiler.target>
     </properties>
