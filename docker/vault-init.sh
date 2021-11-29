@@ -7,7 +7,7 @@ echo "Authenticate into Vault"
 vault login op4BumHD66eeu
 echo "Adding secrets to Vault..."
 vault kv put secret/order-service spring.datasource.username=root spring.datasource.password=root spring.datasource.url=jdbc:mysql://localhost:3306/db
-vault kv put secret/product-service spring.datasource.username=root spring.datasource.password=root spring.datasource.url=jdbc:mysql://localhost:3306/db
+vault kv put secret/product-service spring.data.mongodb.uri=mongodb://admin:admin@localhost:27017/product-service
 vault kv put secret/inventory-service spring.datasource.username=root spring.datasource.password=root spring.datasource.url=jdbc:mysql://localhost:3306/db
 while true
 do

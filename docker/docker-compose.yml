@@ -13,6 +13,13 @@ services:
       - '3306:3306'
     expose:
       - '3306'
+  mongo:
+    image: mongo
+    container_name: mongodb-ecommerce
+    environment:
+       - MONGODB_PASS=admin
+    ports:
+       - 27017:27017
   vault:
     image: vault:1.6.0
     container_name: vault-ecommerce
@@ -45,6 +52,70 @@ services:
       - STORAGE_TYPE=mem
     ports:
       - 9411:9411
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+    container_name: elasticsearch-ecommerce
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    configs:
+      - source: elastic_config
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_USERNAME: root
+      ELASTIC_PASSWORD: root
+      discovery.type: single-node
+      xpack.security.enabled: false
+    networks:
+      - elk
+    deploy:
+      mode: replicated
+      replicas: 1
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.6.2
+    container_name: logstash-ecommerce
+    ports:
+      - "5000:5000"
+      - "9600:9600"
+    configs:
+      - source: logstash_config
+        target: /usr/share/logstash/config/logstash.yml
+      - source: logstash_pipeline
+        target: /usr/share/logstash/pipeline/logstash.conf
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - elk
+    deploy:
+      mode: replicated
+      replicas: 1
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.6.2
+    container_name: kibana-ecommerce
+    ports:
+      - "5601:5601"
+    configs:
+      - source: kibana_config
+        target: /usr/share/kibana/config/kibana.yml
+    networks:
+      - elk
+    deploy:
+      mode: replicated
+      replicas: 1
+configs:
+  elastic_config:
+    file: ./elasticsearch/config/elasticsearch.yml
+  logstash_config:
+    file: ./logstash/config/logstash.yml
+  logstash_pipeline:
+    file: ./logstash/pipeline/logstash.conf
+  kibana_config:
+    file: ./kibana/config/kibana.yml
+volumes:
+  elasticsearch:
 networks:
   rabbitmq_go_net:
+    driver: bridge
+  elk:
     driver: bridge
